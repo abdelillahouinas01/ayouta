@@ -1,116 +1,149 @@
-const canvas = document.getElementById("stars");
-const ctx = canvas.getContext("2d");
-const heart = document.getElementById("heart");
-const stage = document.getElementById("heartStage");
-const cursorGlow = document.getElementById("cursorGlow");
-const toast = document.getElementById("toast");
-const quoteEl = document.getElementById("quote");
-const revealBtn = document.getElementById("revealBtn");
-const secret = document.getElementById("secret");
-
-const quotes = [
-  "If I could keep one beautiful thought close to me, it would be the thought of you.",
-  "Your name has a quiet way of making an ordinary moment feel special.",
-  "Some feelings do not need a perfect explanation. They just need to be honest.",
-  "I hope life gives you countless reasons to smile, because your smile deserves them.",
-  "Among a thousand little moments, somehow my favorite ones keep reminding me of you."
+// ==========================================
+// 1. مصفوفة الاعترافات باللغة الإنجليزية
+// ==========================================
+const confessions = [
+  "In a world full of temporary things, you are my perpetual constant.",
+  "Every single detail about you feels like pure magic to my soul.",
+  "Loving you is not just a choice; it's as natural as breathing.",
+  "You brought colors into my world that I never even knew existed.",
+  "No matter where life leads us, my heart will always belong to JUI."
 ];
 
-let quoteIndex = 0;
+let currentIndex = 0;
+const quoteTextEl = document.getElementById("confessionText");
+const dotsContainer = document.getElementById("dotsContainer");
+const interactiveBtn = document.getElementById("interactiveBtn");
+
+// ==========================================
+// 2. إنشاء مؤشرات النقاط (Progress Dots)
+// ==========================================
+confessions.forEach((_, index) => {
+  const dot = document.createElement("div");
+  dot.classList.add("dot");
+  if (index === 0) dot.classList.add("active");
+  dotsContainer.appendChild(dot);
+});
+
+const dots = document.querySelectorAll(".dot");
+
+function updateConfession() {
+  // إخفاء النص الحالي
+  quoteTextEl.classList.remove("visible");
+
+  setTimeout(() => {
+    // تحديث النص
+    quoteTextEl.textContent = confessions[currentIndex];
+    quoteTextEl.classList.add("visible");
+
+    // تحديث النقاط النشطة
+    dots.forEach((dot, idx) => {
+      dot.classList.toggle("active", idx === currentIndex);
+    });
+
+    // الانتقال للجملة التالية
+    currentIndex = (currentIndex + 1) % confessions.length;
+  }, 600); // إعطاء وقت للانتقال التدريجي
+}
+
+// البدء التلقائي وتبديل الجملة كل 4.5 ثوانٍ
+updateConfession();
+let autoCycle = setInterval(updateConfession, 4500);
+
+// تفاعل زر الضغط manual trigger
+interactiveBtn.addEventListener("click", (e) => {
+  clearInterval(autoCycle);
+  updateConfession();
+  createHeartBurst(e.clientX, e.clientY);
+  autoCycle = setInterval(updateConfession, 4500);
+});
+
+// ==========================================
+// 3. تأثير انبعاث القلوب التفاعلي عند النقر
+// ==========================================
+function createHeartBurst(x, y) {
+  for (let i = 0; i < 8; i++) {
+    const heart = document.createElement("div");
+    heart.innerHTML = "💖";
+    heart.style.position = "fixed";
+    heart.style.left = `${x}px`;
+    heart.style.top = `${y}px`;
+    heart.style.fontSize = `${Math.random() * 20 + 15}px`;
+    heart.style.pointerEvents = "none";
+    heart.style.zIndex = "100";
+    
+    const destinationX = (Math.random() - 0.5) * 200;
+    const destinationY = (Math.random() - 0.5) * 200;
+
+    heart.animate([
+      { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+      { transform: `translate(${destinationX}px, ${destinationY}px) scale(0)`, opacity: 0 }
+    ], {
+      duration: 1000 + Math.random() * 500,
+      easing: 'cubic-bezier(0, .9, .57, 1)'
+    }).onfinish = () => heart.remove();
+
+    document.body.appendChild(heart);
+  }
+}
+
+// ==========================================
+// 4. خلفية الجسيمات المضيئة (Particle Canvas)
+// ==========================================
+const canvas = document.getElementById("particlesCanvas");
+const ctx = canvas.getContext("2d");
+
 let particles = [];
-let mouse = { x: innerWidth / 2, y: innerHeight / 2 };
 
 function resizeCanvas() {
-  const dpr = Math.min(devicePixelRatio || 1, 2);
-  canvas.width = innerWidth * dpr;
-  canvas.height = innerHeight * dpr;
-  canvas.style.width = innerWidth + "px";
-  canvas.style.height = innerHeight + "px";
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  particles = Array.from({ length: Math.min(120, Math.floor(innerWidth / 10)) }, () => ({
-    x: Math.random() * innerWidth,
-    y: Math.random() * innerHeight,
-    r: Math.random() * 1.5 + .2,
-    speed: Math.random() * .25 + .05,
-    alpha: Math.random() * .65 + .15
-  }));
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 }
-function drawStars() {
-  ctx.clearRect(0, 0, innerWidth, innerHeight);
-  for (const p of particles) {
-    p.y -= p.speed;
-    if (p.y < -5) { p.y = innerHeight + 5; p.x = Math.random() * innerWidth; }
-    ctx.globalAlpha = p.alpha;
-    ctx.fillStyle = "#fff";
-    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+class Particle {
+  constructor() {
+    this.reset();
   }
-  ctx.globalAlpha = 1;
-  requestAnimationFrame(drawStars);
-}
-resizeCanvas(); drawStars();
-addEventListener("resize", resizeCanvas);
 
-addEventListener("pointermove", e => {
-  mouse.x = e.clientX; mouse.y = e.clientY;
-  cursorGlow.style.left = e.clientX + "px";
-  cursorGlow.style.top = e.clientY + "px";
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.size = Math.random() * 3 + 1;
+    this.speedX = (Math.random() - 0.5) * 0.8;
+    this.speedY = (Math.random() - 0.5) * 0.8;
+    this.alpha = Math.random() * 0.6 + 0.2;
+  }
 
-  const rect = stage.getBoundingClientRect();
-  const dx = (e.clientX - (rect.left + rect.width / 2)) / rect.width;
-  const dy = (e.clientY - (rect.top + rect.height / 2)) / rect.height;
-  heart.style.transform = `translate(${dx * 14}px, ${dy * 14}px) rotateX(${dy * -5}deg) rotateY(${dx * 7}deg) scale(1.02)`;
-});
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
 
-stage.addEventListener("pointerleave", () => heart.style.transform = "");
+    if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+      this.reset();
+    }
+  }
 
-document.getElementById("nextQuote").addEventListener("click", () => {
-  quoteIndex = (quoteIndex + 1) % quotes.length;
-  quoteEl.animate(
-    [{opacity:0, transform:"translateY(8px)"},{opacity:1, transform:"translateY(0)"}],
-    {duration:420, easing:"ease-out"}
-  );
-  quoteEl.textContent = quotes[quoteIndex];
-});
-
-revealBtn.addEventListener("click", () => {
-  secret.classList.toggle("show");
-  revealBtn.innerHTML = secret.classList.contains("show")
-    ? "Hide the final message <span>↑</span>"
-    : "Reveal the final message <span>✦</span>";
-  showToast(secret.classList.contains("show") ? "A message from the heart ✦" : "Until next time ♡");
-});
-
-function showToast(message) {
-  toast.textContent = message;
-  toast.classList.add("show");
-  clearTimeout(showToast.timer);
-  showToast.timer = setTimeout(() => toast.classList.remove("show"), 2200);
+  draw() {
+    ctx.fillStyle = `rgba(255, 117, 140, ${this.alpha})`;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
 }
 
-document.getElementById("soundBtn").addEventListener("click", e => {
-  const label = e.currentTarget.querySelector("span");
-  label.textContent = label.textContent === "OFF" ? "ON" : "OFF";
-  showToast(label.textContent === "ON"
-    ? "Ambient sound is ready — add your own audio in script.js."
-    : "Sound turned off.");
-});
+for (let i = 0; i < 60; i++) {
+  particles.push(new Particle());
+}
 
-document.querySelectorAll(".message-card").forEach(card => {
-  card.addEventListener("pointermove", e => {
-    const r = card.getBoundingClientRect();
-    const rx = ((e.clientY - r.top) / r.height - .5) * -5;
-    const ry = ((e.clientX - r.left) / r.width - .5) * 5;
-    card.style.transform = `perspective(700px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-6px)`;
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.update();
+    p.draw();
   });
-  card.addEventListener("pointerleave", () => card.style.transform = "");
-});
+  requestAnimationFrame(animateParticles);
+}
 
-let clicks = 0;
-heart.addEventListener("click", () => {
-  clicks++;
-  heart.animate(
-    [{transform:"scale(1)"},{transform:"scale(1.22)"},{transform:"scale(1)"}],
-    {duration:420, easing:"cubic-bezier(.2,.8,.2,1)"}
-  );
-  showToast(clicks % 3 === 0 ? "The heart noticed you ♥" : "A little heartbeat for JUI ♥");
-});
+animateParticles();

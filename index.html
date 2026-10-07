@@ -1,85 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#080512">
-  <title>JUI — A Little Universe of Love</title>
+  <title>JUI - Love & Light</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts: Poppins & Montserrat -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;1,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <canvas id="stars"></canvas>
-  <div class="aurora aurora-a"></div>
-  <div class="aurora aurora-b"></div>
 
-  <main class="scene">
-    <header class="topbar">
-      <div class="brand"><span class="brand-dot"></span> JUI</div>
-      <button class="sound-btn" id="soundBtn" aria-label="Toggle ambient sound">Sound <span>OFF</span></button>
-    </header>
+  <!-- خلفية الجسيمات التفاعلية -->
+  <canvas id="particlesCanvas"></canvas>
 
-    <section class="hero">
-      <div class="eyebrow">A page made from feelings</div>
-      <h1>JUI</h1>
-      <p class="hero-subtitle">Some names are simply written. Yours is <span>felt.</span></p>
+  <!-- الحاوية الرئيسية -->
+  <main class="card-container">
+    <div class="glass-card">
+      
+      <!-- اسم الواجهة العلوي -->
+      <header class="header">
+        <h1 class="glow-title" data-text="JUI">JUI</h1>
+        <div class="subtitle">A Journey of Pure Emotion</div>
+      </header>
 
-      <div class="heart-stage" id="heartStage" aria-label="Interactive heart">
-        <div class="halo"></div>
-        <div class="heart" id="heart">♥</div>
-        <div class="orbit orbit-1"></div>
-        <div class="orbit orbit-2"></div>
-        <span class="spark s1"></span><span class="spark s2"></span><span class="spark s3"></span>
-      </div>
+      <!-- قسم الاعترافات والجمل المتبدلة -->
+      <section class="quote-wrapper">
+        <div class="quote-box">
+          <p id="confessionText" class="quote-text"></p>
+        </div>
+      </section>
 
-      <p class="hint">Move your cursor around the heart</p>
-    </section>
+      <!-- مؤشر التقدم والتفاعل -->
+      <footer class="footer">
+        <div class="dots-indicator" id="dotsContainer"></div>
+        <button id="interactiveBtn" class="pulse-btn">
+          <span>💖 Tap for Magic</span>
+        </button>
+      </footer>
 
-    <section class="love-grid">
-      <article class="message-card featured">
-        <span class="card-number">01</span>
-        <h2>Why JUI?</h2>
-        <p>Because some people quietly become a beautiful part of your thoughts. Your name has that kind of place in mine.</p>
-      </article>
-
-      <article class="message-card">
-        <span class="card-number">02</span>
-        <h2>My favorite thought</h2>
-        <p>Whenever your name appears, the ordinary moment suddenly feels a little more special.</p>
-      </article>
-
-      <article class="message-card">
-        <span class="card-number">03</span>
-        <h2>A simple confession</h2>
-        <p>I like you. I appreciate you. And I love the way your presence can make a moment feel brighter.</p>
-      </article>
-    </section>
-
-    <section class="quote-section">
-      <div class="quote-mark">“</div>
-      <p id="quote">If I could keep one beautiful thought close to me, it would be the thought of you.</p>
-      <button id="nextQuote">Another thought <span>→</span></button>
-    </section>
-
-    <section class="letter">
-      <div class="letter-line"></div>
-      <p class="mini-label">For JUI, with all my heart</p>
-      <h2>You make ordinary moments<br><em>feel extraordinary.</em></h2>
-      <p class="letter-text">No grand explanation is needed. Sometimes affection is simply a collection of little thoughts, warm smiles, and a name that keeps returning to your mind.</p>
-      <button class="reveal-btn" id="revealBtn">Reveal the final message <span>✦</span></button>
-      <div class="secret" id="secret">I hope you always know how special you are. <strong>JUI, you are loved.</strong></div>
-    </section>
-
-    <footer>
-      <span>Made with a little HTML, CSS & JavaScript</span>
-      <span>JUI <b>♥</b></span>
-    </footer>
+    </div>
   </main>
 
-  <div class="cursor-glow" id="cursorGlow"></div>
-  <div class="toast" id="toast">A little sparkle for you ✦</div>
   <script src="script.js"></script>
 </body>
 </html>
